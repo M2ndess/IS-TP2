@@ -1,0 +1,121 @@
+ <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Crossfit">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Teams">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Team">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Players">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element maxOccurs="unbounded" name="Player">
+                                                        <xs:complexType>
+                                                            <xs:sequence></xs:sequence>
+                                                            <xs:attribute name="id" type="xs:string"/>
+                                                            <xs:attribute name="name" type="xs:string"/>
+                                                            <xs:attribute name="last_name" type="xs:string"/>
+                                                            <xs:attribute name="gender" type="xs:string"/>
+                                                            <xs:attribute name="age" type="xs:string"/>
+                                                            <xs:attribute name="country" type="xs:string"/>
+                                                            <xs:attribute name="competitor_id" type="xs:string"/>
+                                                            <xs:attribute name="competitor_name" type="xs:string"/>
+                                                            <xs:attribute name="height" type="xs:string"/>
+                                                            <xs:attribute name="weight" type="xs:string"/>
+                                                            <xs:attribute name="overall_rank" type="xs:string"/>
+                                                            <xs:attribute name="overall_score" type="xs:string"/>
+                                                            <xs:attribute name="year" type="xs:string"/>
+                                                            <xs:attribute name="competition" type="xs:string"/>
+                                                            <xs:attribute name="height_cm" type="xs:string"/>
+                                                            <xs:attribute name="weight_kg" type="xs:string"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="id" type="xs:string"/>
+                                    <xs:attribute name="name" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Players">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Player">
+                                <xs:complexType>
+                                    <xs:sequence></xs:sequence>
+                                    <xs:attribute name="id" type="xs:string"/>
+                                    <xs:attribute name="name" type="xs:string"/>
+                                    <xs:attribute name="last_name" type="xs:string"/>
+                                    <xs:attribute name="gender" type="xs:string"/>
+                                    <xs:attribute name="age" type="xs:string"/>
+                                    <xs:attribute name="country" type="xs:string"/>
+                                    <xs:attribute name="competitor_id" type="xs:string"/>
+                                    <xs:attribute name="competitor_name" type="xs:string"/>
+                                    <xs:attribute name="height" type="xs:string"/>
+                                    <xs:attribute name="weight" type="xs:string"/>
+                                    <xs:attribute name="overall_rank" type="xs:string"/>
+                                    <xs:attribute name="overall_score" type="xs:string"/>
+                                    <xs:attribute name="year" type="xs:string"/>
+                                    <xs:attribute name="competition" type="xs:string"/>
+                                    <xs:attribute name="height_cm" type="xs:string"/>
+                                    <xs:attribute name="weight_kg" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Countries">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Country">
+                                <xs:complexType>
+                                    <xs:sequence></xs:sequence>
+                                    <xs:attribute name="id" type="xs:string"/>
+                                    <xs:attribute name="name" type="xs:string"/>
+                                    <xs:attribute name="latitude" type="xs:string"/>
+                                    <xs:attribute name="longitude" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Competitions">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" name="Competition">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="CompetitionPlayers">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element maxOccurs="unbounded" name="CompetitionPlayer">
+                                                        <xs:complexType>
+                                                            <xs:sequence></xs:sequence>
+                                                            <xs:attribute name="competitor_id" type="xs:string"/>
+                                                            <xs:attribute name="competitor_name" type="xs:string"/>
+                                                            <xs:attribute name="overall_rank" type="xs:string"/>
+                                                            <xs:attribute name="overall_score" type="xs:string"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="id" type="xs:string"/>
+                                    <xs:attribute name="year" type="xs:string"/>
+                                    <xs:attribute name="competition_name" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
