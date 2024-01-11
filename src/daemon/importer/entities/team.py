@@ -28,6 +28,9 @@ class Team:
 
         return el
 
+    def get_id(self):
+        return self._id
+
     def __str__(self):
         return f"{self._name} ({self._id})"
 

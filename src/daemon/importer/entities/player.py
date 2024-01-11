@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 
 class Player:
 
-    def __init__(self, name, last_name, gender, age, country, competitor_id, competitor_name, height, weight,  overall_rank, overall_score, year, competition, height_cm, weight_kg):
+    def __init__(self, name, last_name, gender, age, country, competitor_id, competitor_name, height, weight,  overall_rank, overall_score, year, competition, height_cm, weight_kg, team):
         Player.counter += 1
         self._id = Player.counter
         self._name = name
@@ -20,6 +20,7 @@ class Player:
         self._competition = competition
         self._height_cm = height_cm
         self._weight_kg = weight_kg
+        self._team = team  # Chave estrangeira
 
     def to_xml(self):
         el = ET.Element("Player")
@@ -39,6 +40,7 @@ class Player:
         el.set("competition", self._competition)
         el.set("height_cm", str(self._height_cm))
         el.set("weight_kg", str(self._weight_kg))
+        el.set("team_id", str(self._team.get_id()))
 
         return el
 

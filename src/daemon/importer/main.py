@@ -10,17 +10,21 @@ from watchdog.events import FileSystemEventHandler, FileCreatedEvent
 
 from utils.to_xml_converter import CSVtoXMLConverter
 
+
 def get_csv_files_in_input_folder():
     return [os.path.join(dp, f) for dp, dn, filenames in os.walk(CSV_INPUT_PATH) for f in filenames if
             os.path.splitext(f)[1] == '.csv']
 
+
 def generate_unique_file_name(directory):
     return f"{directory}/{str(uuid.uuid4())}.xml"
+
 
 def convert_csv_to_xml(in_path, out_path):
     converter = CSVtoXMLConverter(in_path)
     file = open(out_path, "w")
     file.write(converter.to_xml_str())
+
 
 class CSVHandler(FileSystemEventHandler):
     def __init__(self, input_path, output_path):
@@ -42,7 +46,6 @@ class CSVHandler(FileSystemEventHandler):
             return
 
         print(f"new file to convert: '{csv_path}'")
-
 
         # Generate a unique file name for the XML file
         xml_path = generate_unique_file_name(self._output_path)
@@ -69,7 +72,7 @@ class CSVHandler(FileSystemEventHandler):
         # Fetch the list of converted files from the database
         query = "SELECT src FROM converted_documents"
         result = execute_query(query)
-        
+
         # Extract the 'src' values from the result
         converted_files = [row[0] for row in result]
 

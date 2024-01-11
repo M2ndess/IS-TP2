@@ -59,7 +59,8 @@ class CSVtoXMLConverter:
                 year=row["year"],
                 competition=row["competition"],
                 height_cm=row["height_cm"],
-                weight_kg=row["weight_kg"]
+                weight_kg=row["weight_kg"],
+                team=teams[row["affiliateName"]]
             ),
             after_create=after_creating_player
         )
