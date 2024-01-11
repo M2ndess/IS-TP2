@@ -1,11 +1,13 @@
 import xml.etree.ElementTree as ET
 
 class CompetitionPlayer:
-    def __init__(self, competitor_id, competitor_name, overall_rank, overall_score):
+    def __init__(self, competitor_id, competitor_name, overall_rank, overall_score, competition):
         self._competitor_id = competitor_id
         self._competitor_name = competitor_name
         self._overall_rank = overall_rank
         self._overall_score = overall_score
+        self._competition = competition  # Chave estrangeira
+
 
     def to_xml(self):
         el = ET.Element("CompetitionPlayer")
@@ -13,6 +15,8 @@ class CompetitionPlayer:
         el.set("competitor_name", self._competitor_name)
         el.set("overall_rank", str(self._overall_rank))
         el.set("overall_score", str(self._overall_score))
+        el.set("competition_id", str(self._competition.get_id()))
+
 
         return el
 
@@ -42,6 +46,9 @@ class Competition:
         el.append(players_el)
 
         return el
+
+    def get_id(self):
+        return self._id
 
     def __str__(self):
         return f"{self._competition_name} ({self._year})"

@@ -72,6 +72,7 @@ class CSVtoXMLConverter:
                 competitor_name=row["competitorName"],
                 overall_rank=row["overallRank"],
                 overall_score=row["overallScore"],
+                competition=competitions[row["competition"]]
             ),
             after_create=after_creating_competition_player
         )
