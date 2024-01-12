@@ -17,7 +17,6 @@ class CompetitionPlayer:
         el.set("overall_score", str(self._overall_score))
         el.set("competition_id", str(self._competition.get_id()))
 
-
         return el
 
 class Competition:

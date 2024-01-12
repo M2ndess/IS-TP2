@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 # install bash
 RUN apk add bash
 
-# install dependencies to communicate with postgres datbases
+# install dependencies to communicate with postgres databases
 RUN apk add postgresql-dev gcc python3-dev musl-dev
 
 # install nodemon
@@ -22,6 +22,10 @@ RUN python -m pip install --upgrade pip
 # dependencies
 COPY ./requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+# install requests
+RUN pip install requests
+RUN pip install pika
 
 # run the script
 CMD (sed -i 's/\r$//' ./run.sh) && (chmod +x ./run.sh) && (./run.sh)

@@ -30,6 +30,7 @@
                                                             <xs:attribute name="competition" type="xs:string"/>
                                                             <xs:attribute name="height_cm" type="xs:string"/>
                                                             <xs:attribute name="weight_kg" type="xs:string"/>
+                                                            <xs:attribute name="team_id" type="xs:string"/>
                                                         </xs:complexType>
                                                     </xs:element>
                                                 </xs:sequence>
@@ -110,6 +111,7 @@
                                     <xs:attribute name="id" type="xs:string"/>
                                     <xs:attribute name="year" type="xs:string"/>
                                     <xs:attribute name="competition_name" type="xs:string"/>
+                                    <xs:attribute name="competition_id" type="xs:string"/>
                                 </xs:complexType>
                             </xs:element>
                         </xs:sequence>

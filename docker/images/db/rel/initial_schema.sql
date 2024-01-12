@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS POSTGIS_TOPOLOGY;
 -- Teams Table
 CREATE TABLE public.teams (
     id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name        VARCHAR(250) NOT NULL,
+    name        VARCHAR(250) NOT NULL
 );
 
 -- Players Table
