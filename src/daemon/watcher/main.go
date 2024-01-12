@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
-	"time"
 
 	"github.com/streadway/amqp"
 )
@@ -41,6 +40,7 @@ type Player struct {
 	Competition     string `xml:"competition,attr"`
 	HeightCm        string `xml:"height_cm,attr"`
 	WeightKg        string `xml:"weight_kg,attr"`
+	TeamId          string `xml:"team_id,attr"`
 }
 
 type Country struct {
@@ -62,6 +62,8 @@ type CompetitionPlayer struct {
 	CompetitorName string `xml:"competitor_name,attr"`
 	OverallRank    string `xml:"overall_rank,attr"`
 	OverallScore   string `xml:"overall_score,attr"`
+	CompetitionId  string `xml:"competition_id,attr"`
+
 }
 
 func sayHelloWorld() {
@@ -149,8 +151,51 @@ func listXMLFilesAndSendToRabbitMQ() {
 	}
 }
 
+func declareQueue(ch *amqp.Channel, queueName string) error {
+	_, err := ch.QueueDeclare(
+		queueName, // nome da fila
+		false,     // durável
+		false,     // exclusivo
+		false,     // autoexclusiva
+		false,     // sem espera
+		nil,       // argumentos adicionais
+	)
+	if err != nil {
+		return fmt.Errorf("Falha ao declarar a fila %s: %v", queueName, err)
+	}
+	return nil
+}
+
+func publishMessage(ch *amqp.Channel, queueName, messageBody string) error {
+	err := ch.Publish(
+		"",       // troca (vazio para troca padrão)
+		queueName, // chave de roteamento (nome da fila)
+		false,    // obrigatório
+		false,    // imediato
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        []byte(messageBody),
+		})
+	if err != nil {
+		return fmt.Errorf("Falha ao publicar mensagem para %s: %v", queueName, err)
+	}
+	return nil
+}
+
 func main() {
 	sayHelloWorld()
 	listXMLFilesAndSendToRabbitMQ()
-	time.Sleep(time.Second) // Espera um pouco para permitir o envio das mensagens para RabbitMQ
+
+	conn, ch, err := connectToRabbitMQ()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	queueName := "xmlFiles"
+
+	err = declareQueue(ch, queueName)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
