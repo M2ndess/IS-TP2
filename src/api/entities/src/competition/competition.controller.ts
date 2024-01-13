@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { CompetitionService } from './competition.service';
 
 @Controller('competitions')
@@ -6,27 +14,31 @@ export class CompetitionController {
   constructor(private readonly competitionService: CompetitionService) {}
 
   @Get()
-  async findAll() {
-    return this.competitionService.findAll();
+  async findAll(): Promise<any[]> {
+    const competitions = await this.competitionService.findAll();
+    return competitions.map((competition) => ({ ...competition }));
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.competitionService.findOne(id);
+  async findOne(@Param('id') id: number): Promise<any> {
+    const competition = await this.competitionService.findOne(id);
+    return { ...competition };
   }
 
   @Post()
-  async create(@Body() data: any) {
-    return this.competitionService.create(data);
+  async create(@Body() data: any): Promise<any> {
+    const competition = await this.competitionService.create(data);
+    return { ...competition };
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: any) {
-    return this.competitionService.update(id, data);
+  async update(@Param('id') id: number, @Body() data: any): Promise<any> {
+    const competition = await this.competitionService.update(id, data);
+    return { ...competition };
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id') id: number) {
     return this.competitionService.delete(id);
   }
 }

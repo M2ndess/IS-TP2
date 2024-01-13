@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { TeamService } from './team.service';
 
 @Controller('teams')
@@ -11,7 +19,7 @@ export class TeamController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: number) {
     return this.teamService.findOne(id);
   }
 
@@ -21,12 +29,12 @@ export class TeamController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: any) {
+  async update(@Param('id') id: number, @Body() data: any) {
     return this.teamService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id') id: number) {
     return this.teamService.delete(id);
   }
 }

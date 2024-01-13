@@ -1,15 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
+
+interface Competition {
+  id: number;
+}
 
 @Injectable()
 export class CompetitionService {
-  private prisma = new PrismaClient();
+  constructor(private readonly prisma: PrismaClient) {}
 
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<Competition[]> {
     return this.prisma.competition.findMany();
   }
 
-  async findOne(id: string): Promise<any> {
+  async findOne(id: number): Promise<Competition> {
     const competition = await this.prisma.competition.findUnique({
       where: { id },
     });
@@ -21,11 +25,14 @@ export class CompetitionService {
     return competition;
   }
 
-  async create(data: any): Promise<any> {
+  async create(data: Prisma.CompetitionCreateInput): Promise<Competition> {
     return this.prisma.competition.create({ data });
   }
 
-  async update(id: string, data: any): Promise<any> {
+  async update(
+    id: number,
+    data: Prisma.CompetitionUpdateInput,
+  ): Promise<Competition> {
     const competition = await this.prisma.competition.findUnique({
       where: { id },
     });
@@ -40,7 +47,7 @@ export class CompetitionService {
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     const competition = await this.prisma.competition.findUnique({
       where: { id },
     });

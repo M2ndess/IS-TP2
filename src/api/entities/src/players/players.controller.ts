@@ -1,9 +1,17 @@
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
-import { PlayerService } from './player.service';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
+import { PlayersService } from './players.service';
 
 @Controller('players')
-export class PlayerController {
-  constructor(private readonly playerService: PlayerService) {}
+export class PlayersController {
+  constructor(private readonly playerService: PlayersService) {}
 
   @Get()
   async findAll() {
@@ -11,7 +19,7 @@ export class PlayerController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: number) {
     return this.playerService.findOne(id);
   }
 
@@ -21,12 +29,12 @@ export class PlayerController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: any) {
+  async update(@Param('id') id: number, @Body() data: any) {
     return this.playerService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id') id: number) {
     return this.playerService.delete(id);
   }
 }
