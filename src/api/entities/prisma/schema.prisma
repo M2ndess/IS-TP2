@@ -1,6 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// Prisma schema
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,12 +8,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Teacher {
-  name       String   @id
-  city       String
-  createdOn  DateTime @default(now()) @map("created_on")
-  updatedOn  DateTime @updatedAt @map("updated_on")
+model Players {
+  id              Int       @id
+  name            String
+  last_name       String
+  gender          String
+  age             Int
+  country         String
+  competitor_id   String
+  competitor_name String
+  height          String
+  weight          String
+  overall_rank    String
+  overall_score   String
+  year            String
+  competition     String
+  height_cm       String
+  weight_kg       String
+  team            Team?      @relation(fields: [team_id], references: [id])
+  team_id         Int?
 
-  @@map("teachers")
+  @@map("players")
 }
 
+model Team {
+  id      Int     @id
+  name String
+  players Players[]
+
+  @@map("team")
+}
+
+model Competition {
+  id                Int              @id
+  year              String
+  competition_name  String
+  competition_players CompetitionPlayer[]
+
+  @@map("competition")
+}
+
+model CompetitionPlayer {
+  id              Int            @id
+  competitor_id   String
+  competitor_name String
+  overall_rank    String
+  overall_score   String
+  competition_id  Int            @map("competition_id")
+  competition     Competition       @relation(fields: [competition_id], references: [id])
+
+  @@map("competitionPlayer")
+}
+
+model Country {
+  id       Int   @id
+  name      String  @unique
+  latitude  String
+  longitude String
+
+  @@map("country")
+}

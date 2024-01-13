@@ -6,7 +6,7 @@ import pika
 
 POLLING_FREQ = int(sys.argv[1]) if len(sys.argv) >= 2 else 60
 
-API_BASE_URL = "http://api-entities-base-url"
+API_BASE_URL = "http://localhost:20001"
 
 
 def print_psycopg2_exception(ex):
