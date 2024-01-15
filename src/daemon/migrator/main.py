@@ -46,13 +46,18 @@ def get_task_from_broker():
         print(f"Error getting task from broker: {e}")
         return None
 
+
 def consume_messages():
     while True:
         task = get_task_from_broker()
 
         if task:
             processed_data = process_xml_data(task)
-            send_data_to_api(processed_data)
+
+            # Send data for each entity type
+            send_data_to_api("team", processed_data["teams"])
+            send_data_to_api("players", processed_data["players"])
+            send_data_to_api("competition", processed_data["competition"])
 
         time.sleep(POLLING_FREQ)
 
@@ -86,8 +91,8 @@ def process_xml_data(xml_data):
         country_data = {attr: country_element.get(attr) for attr in country_element.attrib}
         countries.append(country_data)
 
-    competitions = []
-    for competition_element in root.findall('.//Competitions/Competition'):
+    competition = []
+    for competition_element in root.findall('.//Competition/Competition'):
         competition_id = competition_element.get('id')
         competition_year = competition_element.get('year')
         competition_name = competition_element.get('competition_name')
@@ -98,7 +103,7 @@ def process_xml_data(xml_data):
                                        competition_player_element.attrib}
             competition_players.append(competition_player_data)
 
-        competitions.append({
+        competition.append({
             "competition_id": competition_id,
             "year": competition_year,
             "competition_name": competition_name,
@@ -109,17 +114,17 @@ def process_xml_data(xml_data):
         "teams": teams,
         "players": players,
         "countries": countries,
-        "competitions": competitions
+        "competition": competition
     }
 
 
-def send_data_to_api(data):
+def send_data_to_api(entity, data):
     try:
-        response = requests.post(f"{API_BASE_URL}/migration_endpoint", json=data)
+        response = requests.post(f"{API_BASE_URL}/{entity}", json=data)
         response.raise_for_status()
-        print("Data sent successfully to API.")
+        print(f"Data for {entity} sent successfully to API.")
     except requests.exceptions.RequestException as e:
-        print(f"Error sending data to API: {e}")
+        print(f"Error sending data for {entity} to API: {e}")
 
 
 if __name__ == "__main__":

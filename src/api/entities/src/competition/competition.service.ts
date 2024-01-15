@@ -2,7 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 interface Competition {
-  id: number;
+  id: string;
+  year: string;
+  competition_name: string;
 }
 
 @Injectable()
@@ -10,46 +12,67 @@ export class CompetitionService {
   constructor(private readonly prisma: PrismaClient) {}
 
   async findAll(): Promise<Competition[]> {
-    return this.prisma.competition.findMany();
+    const competitions = await this.prisma.competition.findMany();
+    return competitions.map((competition) => ({
+      id: competition.id.toString(),
+      year: competition.year,
+      competition_name: competition.competition_name,
+    }));
   }
 
-  async findOne(id: number): Promise<Competition> {
+  async findOne(id: string): Promise<Competition> {
     const competition = await this.prisma.competition.findUnique({
-      where: { id },
+      where: { id: Number(id) }, // Convert id to number before querying
     });
 
     if (!competition) {
       throw new NotFoundException(`Competition with ID ${id} not found`);
     }
 
-    return competition;
+    return {
+      id: competition.id.toString(),
+      year: competition.year,
+      competition_name: competition.competition_name,
+    };
   }
 
   async create(data: Prisma.CompetitionCreateInput): Promise<Competition> {
-    return this.prisma.competition.create({ data });
+    const createdCompetition = await this.prisma.competition.create({ data });
+
+    return {
+      id: createdCompetition.id.toString(),
+      year: createdCompetition.year,
+      competition_name: createdCompetition.competition_name,
+    };
   }
 
   async update(
-    id: number,
+    id: string,
     data: Prisma.CompetitionUpdateInput,
   ): Promise<Competition> {
     const competition = await this.prisma.competition.findUnique({
-      where: { id },
+      where: { id: Number(id) }, // Convert id to number before querying
     });
 
     if (!competition) {
       throw new NotFoundException(`Competition with ID ${id} not found`);
     }
 
-    return this.prisma.competition.update({
-      where: { id },
+    const updatedCompetition = await this.prisma.competition.update({
+      where: { id: Number(id) }, // Convert id to number before updating
       data,
     });
+
+    return {
+      id: updatedCompetition.id.toString(),
+      year: updatedCompetition.year,
+      competition_name: updatedCompetition.competition_name,
+    };
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     const competition = await this.prisma.competition.findUnique({
-      where: { id },
+      where: { id: Number(id) }, // Convert id to number before querying
     });
 
     if (!competition) {
@@ -57,7 +80,7 @@ export class CompetitionService {
     }
 
     await this.prisma.competition.delete({
-      where: { id },
+      where: { id: Number(id) }, // Convert id to number before deleting
     });
   }
 }

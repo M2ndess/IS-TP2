@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS POSTGIS;
 CREATE EXTENSION IF NOT EXISTS POSTGIS_TOPOLOGY;
 
 -- Teams Table
-CREATE TABLE public.teams (
+CREATE TABLE public.team (
     id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     name        VARCHAR(250) NOT NULL
 );
@@ -26,8 +26,8 @@ CREATE TABLE public.players (
     competition     VARCHAR(250) NOT NULL,
     height_cm       VARCHAR(50) NOT NULL,
     weight_kg       VARCHAR(50) NOT NULL,
-    team_id         uuid REFERENCES teams(id) ON DELETE SET NULL,
-    FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE SET NULL
+    team_id         uuid REFERENCES team(id) ON DELETE SET NULL,
+    FOREIGN KEY (team_id) REFERENCES team(id) ON DELETE SET NULL
 );
 
 -- Countries Table
@@ -39,7 +39,7 @@ CREATE TABLE public.countries (
 );
 
 -- Competitions Table
-CREATE TABLE public.competitions (
+CREATE TABLE public.competition (
     id              uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     year            VARCHAR(50) NOT NULL,
     competition_name VARCHAR(250) NOT NULL
