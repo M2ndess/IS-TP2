@@ -31,7 +31,7 @@ export class CompetitionService {
   async create(data: Prisma.CompetitionCreateInput): Promise<Competition> {
     const createdCompetition = await this.prisma.competition.create({ data });
     return {
-      id: createdCompetition.id.toString(), // Convert id to string here
+      id: createdCompetition.id.toString(),
     };
   }
 

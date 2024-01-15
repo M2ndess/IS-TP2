@@ -55,9 +55,9 @@ def consume_messages():
             processed_data = process_xml_data(task)
 
             # Send data for each entity type
-            send_data_to_api("team", processed_data["teams"])
+            send_data_to_api("teams", processed_data["teams"])
             send_data_to_api("players", processed_data["players"])
-            send_data_to_api("competition", processed_data["competition"])
+            send_data_to_api("competitions", processed_data["competition"])
 
         time.sleep(POLLING_FREQ)
 
