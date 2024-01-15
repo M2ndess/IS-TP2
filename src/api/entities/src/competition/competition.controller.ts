@@ -6,7 +6,6 @@ import {
   Body,
   Put,
   Delete,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { CompetitionService } from './competition.service';
 
@@ -21,7 +20,7 @@ export class CompetitionController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: string): Promise<any> {
+  async findOne(@Param('id') id: string): Promise<any> {
     const competition = await this.competitionService.findOne(id);
     return { ...competition };
   }
@@ -33,16 +32,13 @@ export class CompetitionController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: string,
-    @Body() data: any,
-  ): Promise<any> {
+  async update(@Param('id') id: string, @Body() data: any): Promise<any> {
     const competition = await this.competitionService.update(id, data);
     return { ...competition };
   }
 
   @Delete(':id')
-  async delete(@Param('id', ParseIntPipe) id: string) {
+  async delete(@Param('id') id: string) {
     return this.competitionService.delete(id);
   }
 }

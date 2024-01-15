@@ -40,7 +40,7 @@ model Team {
 }
 
 model Competition {
-  id                Int              @id
+  id                String              @id
   year              String
   competition_name  String
   competition_players CompetitionPlayer[]
@@ -49,12 +49,12 @@ model Competition {
 }
 
 model CompetitionPlayer {
-  id              Int            @id
+  id              String            @id
   competitor_id   String
   competitor_name String
   overall_rank    String
   overall_score   String
-  competition_id  Int            @map("competition_id")
+  competition_id  String          @map("competition_id")
   competition     Competition       @relation(fields: [competition_id], references: [id])
 
   @@map("competitionPlayer")
