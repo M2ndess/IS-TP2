@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Players {
-  id              Int       @id
+  id              String       @id
   name            String
   last_name       String
   gender          String
@@ -26,13 +26,13 @@ model Players {
   height_cm       String
   weight_kg       String
   team            Team?      @relation(fields: [team_id], references: [id])
-  team_id         Int?
+  team_id         String?
 
   @@map("players")
 }
 
 model Team {
-  id      Int     @id
+  id   String     @id
   name String
   players Players[]
 
@@ -61,7 +61,7 @@ model CompetitionPlayer {
 }
 
 model Country {
-  id       Int   @id
+  id        String  @id
   name      String  @unique
   latitude  String
   longitude String

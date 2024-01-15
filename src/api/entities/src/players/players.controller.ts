@@ -19,7 +19,7 @@ export class PlayersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id') id: string) {
     return this.playerService.findOne(id);
   }
 
@@ -29,12 +29,12 @@ export class PlayersController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: number, @Body() data: any) {
+  async update(@Param('id') id: string, @Body() data: any) {
     return this.playerService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id') id: string) {
     return this.playerService.delete(id);
   }
 }

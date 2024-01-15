@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 interface Country {
-  id: number;
+  id: string;
 }
 
 @Injectable()
@@ -13,7 +13,7 @@ export class CountryService {
     return this.prisma.country.findMany();
   }
 
-  async findOne(id: number): Promise<Country> {
+  async findOne(id: string): Promise<Country> {
     const country = await this.prisma.country.findUnique({
       where: { id },
     });
@@ -29,7 +29,7 @@ export class CountryService {
     return this.prisma.country.create({ data });
   }
 
-  async update(id: number, data: Prisma.CountryUpdateInput): Promise<Country> {
+  async update(id: string, data: Prisma.CountryUpdateInput): Promise<Country> {
     const country = await this.prisma.country.findUnique({
       where: { id },
     });
@@ -44,7 +44,7 @@ export class CountryService {
     });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     const country = await this.prisma.country.findUnique({
       where: { id },
     });

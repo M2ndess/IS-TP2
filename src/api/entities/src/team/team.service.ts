@@ -9,7 +9,7 @@ export class TeamService {
     return this.prisma.team.findMany();
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: string): Promise<any> {
     const team = await this.prisma.team.findUnique({
       where: { id },
     });
@@ -25,7 +25,7 @@ export class TeamService {
     return this.prisma.team.create({ data });
   }
 
-  async update(id: number, data: any): Promise<any> {
+  async update(id: string, data: any): Promise<any> {
     const team = await this.prisma.team.findUnique({
       where: { id },
     });
@@ -40,7 +40,7 @@ export class TeamService {
     });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     const team = await this.prisma.team.findUnique({
       where: { id },
     });

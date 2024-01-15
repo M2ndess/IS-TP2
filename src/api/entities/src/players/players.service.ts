@@ -9,7 +9,7 @@ export class PlayersService {
     return this.prisma.players.findMany();
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: string): Promise<any> {
     const player = await this.prisma.players.findUnique({
       where: { id },
     });
@@ -25,7 +25,7 @@ export class PlayersService {
     return this.prisma.players.create({ data });
   }
 
-  async update(id: number, data: any): Promise<any> {
+  async update(id: string, data: any): Promise<any> {
     const player = await this.prisma.players.findUnique({
       where: { id },
     });
@@ -40,7 +40,7 @@ export class PlayersService {
     });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     const player = await this.prisma.players.findUnique({
       where: { id },
     });

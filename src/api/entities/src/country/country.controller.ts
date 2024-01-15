@@ -19,7 +19,7 @@ export class CountryController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<any> {
+  async findOne(@Param('id') id: string): Promise<any> {
     return this.countryService.findOne(id);
   }
 
@@ -29,12 +29,12 @@ export class CountryController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: number, @Body() data: any): Promise<any> {
+  async update(@Param('id') id: string, @Body() data: any): Promise<any> {
     return this.countryService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id') id: string) {
     return this.countryService.delete(id);
   }
 }
