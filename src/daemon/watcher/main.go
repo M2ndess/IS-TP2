@@ -20,9 +20,9 @@ type Crossfit struct {
 
 // Team struct representa a tabela 'team'
 type Team struct {
-	ID      string   `xml:"id,attr" db:"id"`
-	Name    string   `xml:"name,attr" db:"name"`
-	Players []Player `xml:"Players>Player"`
+	id      string   `xml:"id,attr" db:"id"`
+	name    string   `xml:"name,attr" db:"name"`
+	players []Player `xml:"Players>Player"`
 }
 
 // Player struct representa a tabela 'players'

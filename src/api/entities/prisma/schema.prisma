@@ -68,13 +68,3 @@ model Country {
 
   @@map("country")
 }
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-// Generate Prisma client
-generator client {
-  provider = "prisma-client-js"
-}
