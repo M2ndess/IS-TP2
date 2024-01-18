@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class TeamService {
@@ -21,8 +22,19 @@ export class TeamService {
     return team;
   }
 
-  async create(data: any): Promise<any> {
-    return this.prisma.team.create({ data });
+  async create(data: {
+    team_id: string;
+    name: string;
+    id: string;
+  }): Promise<any> {
+    data.id = data.team_id;
+    data.id = data.id || String(uuidv4());
+    return this.prisma.team.create({
+      data: {
+        id: data.id,
+        name: data.name,
+      },
+    });
   }
 
   async update(id: string, data: any): Promise<any> {

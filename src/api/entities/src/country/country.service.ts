@@ -1,60 +1,38 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient, Country } from '@prisma/client';
+import { omit } from 'lodash';
 
-interface Country {
-  id: string;
+interface CreateCountryInput {
+  name: string;
+  latitude: string;
+  longitude: string;
 }
 
 @Injectable()
 export class CountryService {
-  constructor(private readonly prisma: PrismaClient) {}
+  private prisma = new PrismaClient();
 
-  async findAll(): Promise<Country[]> {
-    return this.prisma.country.findMany();
+  async create(data: CreateCountryInput): Promise<Country> {
+    const createData = omit(data, ['id']);
+
+    return this.prisma.country.create({
+      data: createData,
+    });
   }
 
-  async findOne(id: string): Promise<Country> {
+  async getById(id: string): Promise<Country | null> {
     const country = await this.prisma.country.findUnique({
       where: { id },
     });
 
     if (!country) {
-      throw new NotFoundException(`Country with ID ${id} not found`);
+      throw new NotFoundException(`Country with id ${id} not found`);
     }
 
     return country;
   }
 
-  async create(data: Prisma.CountryCreateInput): Promise<Country> {
-    return this.prisma.country.create({ data });
-  }
-
-  async update(id: string, data: Prisma.CountryUpdateInput): Promise<Country> {
-    const country = await this.prisma.country.findUnique({
-      where: { id },
-    });
-
-    if (!country) {
-      throw new NotFoundException(`Country with ID ${id} not found`);
-    }
-
-    return this.prisma.country.update({
-      where: { id },
-      data,
-    });
-  }
-
-  async delete(id: string): Promise<void> {
-    const country = await this.prisma.country.findUnique({
-      where: { id },
-    });
-
-    if (!country) {
-      throw new NotFoundException(`Country with ID ${id} not found`);
-    }
-
-    await this.prisma.country.delete({
-      where: { id },
-    });
+  async findAll(): Promise<Country[]> {
+    return this.prisma.country.findMany();
   }
 }

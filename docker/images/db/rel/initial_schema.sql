@@ -38,7 +38,7 @@ CREATE TABLE public.countries (
     longitude   VARCHAR(50) NOT NULL
 );
 
--- Competitions Table
+-- Competition Table
 CREATE TABLE public.competition (
     id              uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     year            VARCHAR(50) NOT NULL,
@@ -52,6 +52,6 @@ CREATE TABLE public.competition_players (
     competitor_name VARCHAR(250) NOT NULL,
     overall_rank    VARCHAR(50) NOT NULL,
     overall_score   VARCHAR(50) NOT NULL,
-    competition_id  uuid REFERENCES competitions(id) ON DELETE CASCADE,
-    FOREIGN KEY (competition_id) REFERENCES competitions(id) ON DELETE CASCADE
+    competition_id  uuid REFERENCES competition(id) ON DELETE CASCADE,
+    FOREIGN KEY (competition_id) REFERENCES competition(id) ON DELETE CASCADE
 );

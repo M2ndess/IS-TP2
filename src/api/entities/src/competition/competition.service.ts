@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Competition {
   id: string;
@@ -28,11 +29,9 @@ export class CompetitionService {
     return competition;
   }
 
-  async create(data: Prisma.CompetitionCreateInput): Promise<Competition> {
-    const createdCompetition = await this.prisma.competition.create({ data });
-    return {
-      id: createdCompetition.id.toString(),
-    };
+  async create(data: any): Promise<any> {
+    data.id = data.id || String(uuidv4());
+    return this.prisma.competition.create({ data });
   }
 
   async update(

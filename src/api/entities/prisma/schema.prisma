@@ -13,7 +13,7 @@ model Players {
   name            String
   last_name       String
   gender          String
-  age             Int
+  age             String
   country         String
   competitor_id   String
   competitor_name String
@@ -49,7 +49,7 @@ model Competition {
 }
 
 model CompetitionPlayer {
-  id              String            @id
+  competitions_id String            @id
   competitor_id   String
   competitor_name String
   overall_rank    String
@@ -61,10 +61,20 @@ model CompetitionPlayer {
 }
 
 model Country {
-  id        String  @id
-  name      String  @unique
-  latitude  String
-  longitude String
+  id          String    @id @default(uuid()) @map("id")
+  name        String
+  latitude    String
+  longitude   String
 
   @@map("country")
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Generate Prisma client
+generator client {
+  provider = "prisma-client-js"
 }
