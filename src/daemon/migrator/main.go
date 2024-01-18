@@ -13,7 +13,7 @@ import (
 const (
 	RabbitMQURL = "amqp://is:is@rabbitMQ:5672/is"
 	ImportQueue  = "import_queue"
-	APIURL       = "http://localhost:20001"
+	APIURL       = "http://api-entities:8080"
 )
 
 type Player struct {
@@ -71,6 +71,15 @@ type RabbitMQMessage struct {
 }
 
 func callAPI(entity string, data interface{}) error {
+
+    if entity == "Team" {
+        entity = "teams"
+    } else if entity == "Competition" {
+        entity = "competitions"
+    } else if entity == "Player" {
+        entity = "players"
+    }
+
 	resp, err := resty.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(data).
@@ -116,8 +125,7 @@ func extractEntityData(entity string, body []byte) interface{} {
 
 	jsonStr = jsonStr[:jsonEnd+1]
 
-	jsonStr = strings.Replace(jsonStr, "Import "+entity, "", 1)
-	jsonStr = strings.TrimSuffix(jsonStr, ".")
+	fmt.Printf("Extracted JSON string: %s\n", jsonStr) // Print the extracted JSON string
 
 	if strings.HasPrefix(jsonStr, "{") {
 		err := json.Unmarshal([]byte(jsonStr), &data)
@@ -132,115 +140,61 @@ func extractEntityData(entity string, body []byte) interface{} {
 	return data
 }
 
-func processTeams(data interface{}) {
-	if teams, ok := data.(Team); ok {
-		fmt.Printf("Processing team: %s\n", teams.Name)
-		err := callAPI("teams", teams)
-		if err != nil {
-			log.Printf("Error calling API for team: %v", err)
-		}
-	} else {
-		log.Printf("Invalid data format for teams. Skipping.")
-	}
-}
-
-func processPlayers(data interface{}) {
-	if player, ok := data.(Player); ok {
-		fmt.Printf("Processing player: %s %s\n", player.Name, player.LastName)
-		err := callAPI("players", player)
-		if err != nil {
-			log.Printf("Error calling API for player: %v", err)
-		}
-	} else {
-		log.Printf("Invalid data format for players. Skipping.")
-	}
-}
-
-func processCompetitions(data interface{}) {
-	if competition, ok := data.(Competition); ok {
-		fmt.Printf("Processing competition: %s\n", competition.CompetitionName)
-		err := callAPI("competitions", competition)
-		if err != nil {
-			log.Printf("Error calling API for competition: %v", err)
-		}
-	} else {
-		log.Printf("Invalid data format for competitions. Skipping.")
-	}
-}
-
-func processCompetitionPlayers(data interface{}) {
-	if cp, ok := data.(CompetitionPlayer); ok {
-		fmt.Printf("Processing competition player: %s %s\n", cp.CompetitorName, cp.OverallRank)
-		err := callAPI("competition_players", cp)
-		if err != nil {
-			log.Printf("Error calling API for competition player: %v", err)
-		}
-	} else {
-		log.Printf("Invalid data format for competition_players. Skipping.")
-	}
-}
-
 func main() {
-	fmt.Println("Migrator: Listening for import tasks...")
+    fmt.Println("Migrator: Listening for import tasks...")
 
-	connection, err := amqp.Dial(RabbitMQURL)
-	checkError(err)
-	defer connection.Close()
+    connection, err := amqp.Dial(RabbitMQURL)
+    checkError(err)
+    defer connection.Close()
 
-	channel, err := connection.Channel()
-	checkError(err)
-	defer channel.Close()
+    channel, err := connection.Channel()
+    checkError(err)
+    defer channel.Close()
 
-	queue, err := channel.QueueDeclare(
-		ImportQueue,
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
-	checkError(err)
+    queue, err := channel.QueueDeclare(
+        ImportQueue,
+        false,
+        false,
+        false,
+        false,
+        nil,
+    )
+    checkError(err)
 
-	messages, err := channel.Consume(
-		queue.Name,
-		"",
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	checkError(err)
+    messages, err := channel.Consume(
+        queue.Name,
+        "",
+        true,
+        false,
+        false,
+        false,
+        nil,
+    )
+    checkError(err)
 
-	for message := range messages {
-		fmt.Printf("Received import task: %s\n", message.Body)
+    for message := range messages {
+        fmt.Printf("Received import task: %s\n", message.Body)
 
-		var rabbitMQMessage RabbitMQMessage
-		err := json.Unmarshal(message.Body, &rabbitMQMessage)
-		if err != nil {
-			log.Printf("Error unmarshalling JSON message: %v. Skipping.", err)
-			continue
-		}
+        var rabbitMQMessage RabbitMQMessage
+        err := json.Unmarshal(message.Body, &rabbitMQMessage)
+        if err != nil {
+            log.Printf("Error unmarshalling JSON message: %v. Skipping.", err)
+            continue
+        }
 
-		entityData := extractEntityData(rabbitMQMessage.EntityName, message.Body)
-		if entityData == nil {
-			log.Printf("Error extracting entity data. Skipping.")
-			continue
-		}
+        entityData := extractEntityData(rabbitMQMessage.EntityName, message.Body)
+        if entityData == nil {
+            log.Printf("Error extracting entity data. Skipping.")
+            continue
+        }
 
-		switch entity := entityData.(type) {
-		case Team:
-			processTeams(entity)
-		case Player:
-			processPlayers(entity)
-		case Competition:
-			processCompetitions(entity)
-		case CompetitionPlayer:
-			processCompetitionPlayers(entity)
-		default:
-			log.Printf("Unknown entity: %T. Skipping.", entityData)
-		}
+        // Call the API to insert data into the database
+        err = callAPI(rabbitMQMessage.EntityName, entityData)
+        if err != nil {
+            log.Printf("Error calling API to insert data: %v. Skipping.", err)
+            continue
+        }
 
-		fmt.Println("Import task processed.")
-	}
+        fmt.Println("Import task processed.")
+    }
 }

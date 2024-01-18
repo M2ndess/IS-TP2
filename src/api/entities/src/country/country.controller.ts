@@ -1,22 +1,40 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { CountryService } from './country.service';
 
-@Controller('country')
+@Controller('countries')
 export class CountryController {
   constructor(private readonly countryService: CountryService) {}
 
-  @Post()
-  async create(@Body() data: { name: string }) {
-    return this.countryService.create(data);
+  @Get()
+  async findAll(): Promise<any> {
+    return this.countryService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.countryService.getById(id);
+  async findOne(@Param('id') id: string): Promise<any> {
+    return this.countryService.findOne(id);
   }
 
-  @Get()
-  async findAll() {
-    return this.countryService.findAll();
+  @Post()
+  async create(@Body() data: any): Promise<any> {
+    return this.countryService.create(data);
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() data: any): Promise<any> {
+    return this.countryService.update(id, data);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.countryService.delete(id);
   }
 }
