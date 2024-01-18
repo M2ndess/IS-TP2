@@ -20,30 +20,30 @@ type Crossfit struct {
 
 // Team struct representa a tabela 'team'
 type Team struct {
-	id      string   `xml:"id,attr" db:"id"`
-	name    string   `xml:"name,attr" db:"name"`
-	players []Player `xml:"Players>Player"`
+	ID      string   `xml:"id,attr" db:"id"`
+	Name    string   `xml:"name,attr" db:"name"`
+	Players []Player `xml:"Players>Player"`
 }
 
 // Player struct representa a tabela 'players'
 type Player struct {
-	ID              string `xml:"id,attr" db:"id"`
-	Name            string `xml:"name,attr" db:"name"`
-	LastName        string `xml:"last_name,attr" db:"last_name"`
-	Gender          string `xml:"gender,attr" db:"gender"`
-	Age             float64 `xml:"age,attr" db:"age"`
-	Country         string `xml:"country,attr" db:"country"`
-	CompetitorID    string `xml:"competitor_id,attr" db:"competitor_id"`
-	CompetitorName  string `xml:"competitor_name,attr" db:"competitor_name"`
-	Height          string `xml:"height,attr" db:"height"`
-	Weight          string `xml:"weight,attr" db:"weight"`
-	OverallRank     string `xml:"overall_rank,attr" db:"overall_rank"`
-	OverallScore    string `xml:"overall_score,attr" db:"overall_score"`
-	Year            string `xml:"year,attr" db:"year"`
-	Competition     string `xml:"competition,attr" db:"competition"`
-	HeightCm        string `xml:"height_cm,attr" db:"height_cm"`
-	WeightKg        string `xml:"weight_kg,attr" db:"weight_kg"`
-	TeamID          string `xml:"team_id,attr" db:"team_id"`
+	ID             string `xml:"id,attr" db:"id"`
+	Name           string `xml:"name,attr" db:"name"`
+	LastName       string `xml:"last_name,attr" db:"last_name"`
+	Gender         string `xml:"gender,attr" db:"gender"`
+	Age            float64 `xml:"age,attr" db:"age"`
+	Country        string `xml:"country,attr" db:"country"`
+	CompetitorID   string `xml:"competitor_id,attr" db:"competitor_id"`
+	CompetitorName string `xml:"competitor_name,attr" db:"competitor_name"`
+	Height         string `xml:"height,attr" db:"height"`
+	Weight         string `xml:"weight,attr" db:"weight"`
+	OverallRank    string `xml:"overall_rank,attr" db:"overall_rank"`
+	OverallScore   string `xml:"overall_score,attr" db:"overall_score"`
+	Year           string `xml:"year,attr" db:"year"`
+	Competition    string `xml:"competition,attr" db:"competition"`
+	HeightCm       string `xml:"height_cm,attr" db:"height_cm"`
+	WeightKg       string `xml:"weight_kg,attr" db:"weight_kg"`
+	TeamID         string `xml:"team_id,attr" db:"team_id"`
 }
 
 // Country struct representa a tabela 'countries'
