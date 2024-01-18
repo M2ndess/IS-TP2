@@ -17,29 +17,29 @@ const (
 )
 
 type Player struct {
-	ID             string `json:"id"`
-	Name           string `json:"name"`
-	LastName       string `json:"last_name"`
-	Gender         string `json:"gender"`
-	Age            string `json:"age"`
-	Country        string `json:"country"`
-	CompetitorID   string `json:"competitor_id"`
-	CompetitorName string `json:"competitor_name"`
-	Height         string `json:"height"`
-	Weight         string `json:"weight"`
-	OverallRank    string `json:"overall_rank"`
-	OverallScore   string `json:"overall_score"`
-	Year           string `json:"year"`
-	Competition    string `json:"competition"`
-	HeightCm       string `json:"height_cm"`
-	WeightKg       string `json:"weight_kg"`
-	TeamID         string `json:"team_id"`
+	id             string `json:"id"`
+	name           string `json:"name"`
+	last_name       string `json:"last_name"`
+	gender         string `json:"gender"`
+	age            string `json:"age"`
+	country        string `json:"country"`
+	competitor_id   string `json:"competitor_id"`
+	competitor_name string `json:"competitor_name"`
+	height         string `json:"height"`
+	weight         string `json:"weight"`
+	overall_rank    string `json:"overall_rank"`
+	overall_score   string `json:"overall_score"`
+	year           string `json:"year"`
+	competition    string `json:"competition"`
+	height_cm       string `json:"height_cm"`
+	weight_kg       string `json:"weight_kg"`
+	team_id         string `json:"team_id"`
 }
 
 type Team struct {
-	ID      string   `json:"id"`
-	Name    string   `json:"name"`
-	Players []Player `json:"players"`
+	id      string   `json:"id"`
+	name    string   `json:"name"`
+	players []Player `json:"players"`
 }
 
 type CompetitionPlayer struct {

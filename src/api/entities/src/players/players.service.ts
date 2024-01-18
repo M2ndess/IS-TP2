@@ -24,7 +24,6 @@ export class PlayersService {
 
   async create(data: any): Promise<any> {
     data.id = data.id || String(uuidv4());
-    data.name = data.name || String(uuidv4());
     return this.prisma.players.create({ data });
   }
 

@@ -12,7 +12,7 @@ export class TeamService {
 
   async findOne(id: string): Promise<any> {
     const team = await this.prisma.team.findUnique({
-      where: { id },
+      where: { ID: id },
     });
 
     if (!team) {
@@ -22,24 +22,14 @@ export class TeamService {
     return team;
   }
 
-  async create(data: {
-    team_id: string;
-    name: string;
-    id: string;
-  }): Promise<any> {
-    data.id = data.team_id;
+  async create(data: any): Promise<any> {
     data.id = data.id || String(uuidv4());
-    return this.prisma.team.create({
-      data: {
-        id: data.id,
-        name: data.name,
-      },
-    });
+    return this.prisma.team.create({ data });
   }
 
   async update(id: string, data: any): Promise<any> {
     const team = await this.prisma.team.findUnique({
-      where: { id },
+      where: { ID: id },
     });
 
     if (!team) {
@@ -47,14 +37,14 @@ export class TeamService {
     }
 
     return this.prisma.team.update({
-      where: { id },
+      where: { ID: id },
       data,
     });
   }
 
   async delete(id: string): Promise<void> {
     const team = await this.prisma.team.findUnique({
-      where: { id },
+      where: { ID: id },
     });
 
     if (!team) {
@@ -62,7 +52,7 @@ export class TeamService {
     }
 
     await this.prisma.team.delete({
-      where: { id },
+      where: { ID: id },
     });
   }
 }
