@@ -13,7 +13,7 @@ model Players {
   name            String
   last_name       String
   gender          String
-  age             String
+  age             Float
   country         String
   competitor_id   String
   competitor_name String

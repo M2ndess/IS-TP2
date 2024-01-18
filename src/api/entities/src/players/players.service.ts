@@ -24,7 +24,28 @@ export class PlayersService {
 
   async create(data: any): Promise<any> {
     data.id = data.id || String(uuidv4());
-    return this.prisma.players.create({ data });
+
+    return this.prisma.players.create({
+      data: {
+        id: data.id,
+        name: data.Name,
+        last_name: data.LastName,
+        gender: data.Gender,
+        age: data.Age,
+        country: data.Country,
+        competitor_id: data.CompetitorID,
+        competitor_name: data.CompetitorName,
+        height: data.Height,
+        weight: data.Weight,
+        overall_rank: data.OverallRank,
+        overall_score: data.OverallScore,
+        year: data.Year,
+        competition: data.Competition,
+        height_cm: data.HeightCm,
+        weight_kg: data.WeightKg,
+        team_id: data.TeamID,
+      },
+    });
   }
 
   async update(id: string, data: any): Promise<any> {

@@ -21,7 +21,7 @@ type Player struct {
 	name           string `json:"name"`
 	last_name       string `json:"last_name"`
 	gender         string `json:"gender"`
-	age            string `json:"age"`
+	age            float64 `json:"age"`
 	country        string `json:"country"`
 	competitor_id   string `json:"competitor_id"`
 	competitor_name string `json:"competitor_name"`
