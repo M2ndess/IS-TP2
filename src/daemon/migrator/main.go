@@ -64,6 +64,12 @@ func checkError(err error) {
 	}
 }
 
+// RabbitMQMessage representa a estrutura da mensagem JSON recebida do RabbitMQ
+type RabbitMQMessage struct {
+	EntityName string `json:"entity_name"`
+	Data       json.RawMessage `json:"data"`
+}
+
 func callAPI(entity string, data interface{}) error {
 	resp, err := resty.R().
 		SetHeader("Content-Type", "application/json").
@@ -84,30 +90,94 @@ func callAPI(entity string, data interface{}) error {
 func extractEntityData(entity string, body []byte) interface{} {
 	var data interface{}
 
-	// Convert the message body to a string
-	messageStr := string(body)
+	messageStr := strings.TrimSpace(string(body))
 
-	// Remove leading and trailing whitespaces
-	messageStr = strings.TrimSpace(messageStr)
-
-	// Check if the message contains the entity name
 	entityIndex := strings.Index(messageStr, entity)
 	if entityIndex == -1 {
 		log.Printf("Entity not found in the message. Skipping.")
 		return nil
 	}
 
-	// Extract the JSON part of the message
 	jsonStr := messageStr[entityIndex+len(entity):]
 
-	// Unmarshal the JSON data
-	err := json.Unmarshal([]byte(jsonStr), &data)
-	if err != nil {
-		log.Printf("Error extracting JSON data: %v. Skipping.", err)
+	jsonStart := strings.Index(jsonStr, "{")
+	if jsonStart == -1 {
+		log.Printf("JSON data not found in the message. Skipping.")
 		return nil
 	}
 
+	jsonStr = jsonStr[jsonStart:]
+
+	jsonEnd := strings.LastIndex(jsonStr, "}}")
+	if jsonEnd == -1 {
+		log.Printf("Invalid JSON format in the message. Skipping.")
+		return nil
+	}
+
+	jsonStr = jsonStr[:jsonEnd+1]
+
+	jsonStr = strings.Replace(jsonStr, "Import "+entity, "", 1)
+	jsonStr = strings.TrimSuffix(jsonStr, ".")
+
+	if strings.HasPrefix(jsonStr, "{") {
+		err := json.Unmarshal([]byte(jsonStr), &data)
+		if err != nil {
+			log.Printf("Error extracting JSON data: %v. Skipping.", err)
+			return nil
+		}
+	} else {
+		data = jsonStr
+	}
+
 	return data
+}
+
+func processTeams(data interface{}) {
+	if teams, ok := data.(Team); ok {
+		fmt.Printf("Processing team: %s\n", teams.Name)
+		err := callAPI("teams", teams)
+		if err != nil {
+			log.Printf("Error calling API for team: %v", err)
+		}
+	} else {
+		log.Printf("Invalid data format for teams. Skipping.")
+	}
+}
+
+func processPlayers(data interface{}) {
+	if player, ok := data.(Player); ok {
+		fmt.Printf("Processing player: %s %s\n", player.Name, player.LastName)
+		err := callAPI("players", player)
+		if err != nil {
+			log.Printf("Error calling API for player: %v", err)
+		}
+	} else {
+		log.Printf("Invalid data format for players. Skipping.")
+	}
+}
+
+func processCompetitions(data interface{}) {
+	if competition, ok := data.(Competition); ok {
+		fmt.Printf("Processing competition: %s\n", competition.CompetitionName)
+		err := callAPI("competitions", competition)
+		if err != nil {
+			log.Printf("Error calling API for competition: %v", err)
+		}
+	} else {
+		log.Printf("Invalid data format for competitions. Skipping.")
+	}
+}
+
+func processCompetitionPlayers(data interface{}) {
+	if cp, ok := data.(CompetitionPlayer); ok {
+		fmt.Printf("Processing competition player: %s %s\n", cp.CompetitorName, cp.OverallRank)
+		err := callAPI("competition_players", cp)
+		if err != nil {
+			log.Printf("Error calling API for competition player: %v", err)
+		}
+	} else {
+		log.Printf("Invalid data format for competition_players. Skipping.")
+	}
 }
 
 func main() {
@@ -145,25 +215,30 @@ func main() {
 	for message := range messages {
 		fmt.Printf("Received import task: %s\n", message.Body)
 
-		// Extract the entity and data from the message
-		parts := strings.SplitN(string(message.Body), ":", 2)
-		if len(parts) != 2 {
-			log.Printf("Invalid message format. Skipping.")
+		var rabbitMQMessage RabbitMQMessage
+		err := json.Unmarshal(message.Body, &rabbitMQMessage)
+		if err != nil {
+			log.Printf("Error unmarshalling JSON message: %v. Skipping.", err)
 			continue
 		}
 
-		entity := parts[0]
-		entityData := extractEntityData(entity, []byte(parts[1]))
+		entityData := extractEntityData(rabbitMQMessage.EntityName, message.Body)
 		if entityData == nil {
 			log.Printf("Error extracting entity data. Skipping.")
 			continue
 		}
 
-		// Call the API with the extracted entity data
-		err := callAPI(entity, entityData)
-		if err != nil {
-			log.Printf("Error calling API: %v", err)
-			// Handle the error as needed
+		switch entity := entityData.(type) {
+		case Team:
+			processTeams(entity)
+		case Player:
+			processPlayers(entity)
+		case Competition:
+			processCompetitions(entity)
+		case CompetitionPlayer:
+			processCompetitionPlayers(entity)
+		default:
+			log.Printf("Unknown entity: %T. Skipping.", entityData)
 		}
 
 		fmt.Println("Import task processed.")

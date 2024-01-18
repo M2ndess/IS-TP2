@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -72,7 +73,13 @@ type CompetitionPlayer struct {
 	CompetitionID  string `xml:"competition_id,attr" db:"competition_id"`
 }
 
-func sendMessageToBroker(dataName string, ch *amqp.Channel) bool {
+// Estrutura geral para enviar ao RabbitMQ
+type RabbitMQMessage struct {
+	EntityName string      `json:"entity_name"`
+	Data       interface{} `json:"data"`
+}
+
+func sendMessageToBroker(entityName string, data interface{}, ch *amqp.Channel) bool {
 	// Create the connection string
 	connectionString := fmt.Sprintf("amqp://is:is@rabbitMQ:5672/is")
 
@@ -97,14 +104,27 @@ func sendMessageToBroker(dataName string, ch *amqp.Channel) bool {
 		return false
 	}
 
+	// Crie a mensagem a ser enviada ao RabbitMQ
+	rabbitMQMessage := RabbitMQMessage{
+		EntityName: entityName,
+		Data:       data,
+	}
+
+	// Converta a mensagem para JSON
+	messageBody, err := json.Marshal(rabbitMQMessage)
+	if err != nil {
+		CheckError(err)
+		return false
+	}
+
 	err = ch.Publish(
 		"",           // Exchange
 		q.Name,       // Routing key
 		false,        // Mandatory
 		false,        // Immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(fmt.Sprintf("Import %s", dataName)),
+			ContentType: "application/json",
+			Body:        messageBody,
 		},
 	)
 	if err != nil {
@@ -113,7 +133,7 @@ func sendMessageToBroker(dataName string, ch *amqp.Channel) bool {
 	}
 
 	// Print success message
-	fmt.Println("Successfully sent message to RabbitMQ")
+	fmt.Printf("Successfully sent message to RabbitMQ for entity: %s\n", entityName)
 	return true
 }
 
@@ -149,7 +169,7 @@ func processCountries(countries []Country, ch *amqp.Channel) {
 	for _, country := range countries {
 		fmt.Printf("Country: %s\n", country.Name)
 		// Enviar mensagem para o RabbitMQ para a country
-		sendMessageToBroker(country.Name, ch)
+		sendMessageToBroker("Country", country, ch)
 	}
 }
 
@@ -162,12 +182,12 @@ func processAllData(crossfitData Crossfit, ch *amqp.Channel) {
 	for _, team := range crossfitData.Teams {
 		fmt.Printf("  Team: %s\n", team.Name)
 		// Enviar mensagem para o RabbitMQ para a team
-		sendMessageToBroker(team.Name, ch)
+		sendMessageToBroker("Team", team, ch)
 
 		for _, player := range team.Players {
 			fmt.Printf("    Player: %s %s\n", player.Name, player.LastName)
 			// Enviar mensagem para o RabbitMQ para o player
-			sendMessageToBroker(player.Name, ch)
+			sendMessageToBroker("Player", player, ch)
 		}
 	}
 
@@ -175,12 +195,12 @@ func processAllData(crossfitData Crossfit, ch *amqp.Channel) {
 	for _, competition := range crossfitData.Competitions {
 		fmt.Printf("  Competition: %s\n", competition.CompetitionName)
 		// Enviar mensagem para o RabbitMQ para a competition
-		sendMessageToBroker(competition.CompetitionName, ch)
+		sendMessageToBroker("Competition", competition, ch)
 
 		for _, cp := range competition.CompetitionPlayers {
 			fmt.Printf("    Competition Player: %s %s\n", cp.CompetitorName, cp.OverallRank)
 			// Enviar mensagem para o RabbitMQ para o competition player
-			sendMessageToBroker(cp.CompetitorName, ch)
+			sendMessageToBroker("CompetitionPlayer", cp, ch)
 		}
 	}
 }
@@ -214,7 +234,7 @@ func main() {
 	defer ch.Close()
 
 	// Check RabbitMQ connection and print success message
-	if success := sendMessageToBroker("exampleCountry", ch); success {
+	if success := sendMessageToBroker("exampleCountry", Crossfit{}, ch); success {
 		fmt.Println("RabbitMQ connection is successful!")
 	} else {
 		fmt.Println("Failed to send message to RabbitMQ")
