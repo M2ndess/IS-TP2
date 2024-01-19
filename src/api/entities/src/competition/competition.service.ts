@@ -13,7 +13,7 @@ export class CompetitionService {
   async findAll(): Promise<Competition[]> {
     const competitions = await this.prisma.competition.findMany();
     return competitions.map((competition) => ({
-      id: competition.id.toString(), // Convert id to string here
+      id: competition.id.toString(),
     }));
   }
 
