@@ -22,7 +22,12 @@ export class TeamService {
   }
 
   async create(data: any): Promise<any> {
-    return this.prisma.team.create({ data });
+    return this.prisma.team.create({
+      data: {
+        id: data.ID,
+        name: data.Name,
+      },
+    });
   }
 
   async update(id: string, data: any): Promise<any> {
