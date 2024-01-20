@@ -1,23 +1,64 @@
 import sys
-
-from flask import Flask
+import xmlrpc.client
+from flask import Flask,request,jsonify
+from flask_cors import CORS
 
 PORT = int(sys.argv[1]) if len(sys.argv) >= 2 else 9000
-
 app = Flask(__name__)
-app.config["DEBUG"] = True
+CORS(app)
 
+@app.route('/api/players_team', methods=['GET'])
+def get_players_by_team():
+    server_url = 'http://rpc-server:9000'
+    server = xmlrpc.client.ServerProxy(server_url)
+    nome_team=request.args.get("nome_team")
+    players = server.get_players_by_team(nome_team)
 
-@app.route('/api/best_players', methods=['GET'])
-def get_best_players():
-    return [{
-        "id": "7674fe6a-6c8d-47b3-9a1f-18637771e23b",
-        "name": "Ronaldo",
-        "country": "Portugal",
-        "position": "Striker",
-        "imgUrl": "https://cdn-icons-png.flaticon.com/512/805/805401.png",
-        "number": 7
-    }]
+    return players
+
+@app.route('/api/players_age', methods=['GET'])
+def get_players_by_age():
+    server_url = 'http://rpc-server:9000'
+    server = xmlrpc.client.ServerProxy(server_url)
+    age=request.args.get("age")
+    players = server.get_player_by_age(age)
+
+    return players
+
+@app.route('/api/players_overall_rank', methods=['GET'])
+def get_players_by_overall_rank():
+    server_url = 'http://rpc-server:9000'
+    server = xmlrpc.client.ServerProxy(server_url)
+    overall_rank=request.args.get("overall_rank")
+    players = server.get_players_by_overall_rank(overall_rank)
+
+    return players
+
+@app.route('/api/players_country', methods=['GET'])
+def get_players_by_country():
+    server_url = 'http://rpc-server:9000'
+    server = xmlrpc.client.ServerProxy(server_url)
+    country=request.args.get("country")
+    players = server.get_players_by_country(country)
+
+    return players
+
+@app.route('/api/players_weight_height', methods=['GET'])
+def group_players_by_weight_height():
+    server_url = 'http://rpc-server:9000'
+    server = xmlrpc.client.ServerProxy(server_url)
+    players = server.group_players_by_weight_height();
+
+    return players
+
+@app.route('/api/players_competitor_id', methods=['GET'])
+def get_players_info_by_competitor_id():
+    server_url = 'http://rpc-server:9000'
+    server = xmlrpc.client.ServerProxy(server_url)
+    competitor_id=request.args.get("competitor_id")
+    players = server.get_players_info_by_competitor_id(competitor_id)
+
+    return players
 
 
 if __name__ == '__main__':
