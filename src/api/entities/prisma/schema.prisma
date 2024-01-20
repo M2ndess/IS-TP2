@@ -61,10 +61,10 @@ model CompetitionPlayer {
 }
 
 model Country {
-  id          String    @id @default(uuid()) @map("id")
+  id          String    @id
   name        String
   latitude    String
   longitude   String
 
-  @@map("country")
+  @@map("countries")
 }

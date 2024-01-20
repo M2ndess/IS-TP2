@@ -17,6 +17,7 @@ const (
 )
 
 var entityPluralMap = map[string]string{
+    "Country":     "countries",
 	"Team":        "teams",
 	"Competition": "competitions",
 	"Player":      "players",

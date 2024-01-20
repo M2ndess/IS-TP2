@@ -25,8 +25,15 @@ export class CountryService {
     return country;
   }
 
-  async create(data: Prisma.CountryCreateInput): Promise<Country> {
-    return this.prisma.country.create({ data });
+  async create(data: any): Promise<any> {
+    return this.prisma.country.create({
+      data: {
+        id: data.ID,
+        name: data.Name,
+        latitude: '',
+        longitude: '',
+      },
+    });
   }
 
   async update(id: string, data: Prisma.CountryUpdateInput): Promise<Country> {
