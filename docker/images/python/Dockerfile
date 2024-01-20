@@ -27,5 +27,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install requests
 RUN pip install pika
 
+# install Flask-CORS
+RUN pip install flask-cors
+
 # run the script
 CMD (sed -i 's/\r$//' ./run.sh) && (chmod +x ./run.sh) && (./run.sh)
