@@ -72,9 +72,16 @@ def get_text_coordinates():
         # Use parameterized query to avoid SQL injection
         query = "SELECT ST_AsText(coords) FROM countries WHERE id = %s"
         result = db.selectAll(query, (country_id,))
-        text_coordinates = result[0] if result else 'N/A'
 
-        return jsonify({"textCoordinates": text_coordinates}), 200
+        # Extract coordinates from the result
+        text_coordinates = result[0][0] if result else 'N/A'
+        if text_coordinates != 'N/A':
+            # Extracting latitude and longitude from the "POINT(lon lat)" format
+            lon_lat_str = text_coordinates.replace('POINT(', '').replace(')', '')
+            lon, lat = map(float, lon_lat_str.split())
+            return jsonify({"longitude": lon, "latitude": lat}), 200
+        else:
+            return jsonify({"error": "Coordinates not found for the given country_id"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
