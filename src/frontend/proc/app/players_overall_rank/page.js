@@ -18,7 +18,6 @@ import {
 import useAPI from "../crud/crudAPI";
 import TextField from '@mui/material/TextField';
 
-
 function PlayersPage() {
   const { GET } = useAPI();
 
@@ -28,9 +27,11 @@ function PlayersPage() {
   const handleOverallInputChange = async () => {
     try {
       const result = await GET(`/players_overall_rank?overall_rank=${manualOverallInput}`);
+      console.log("Server response:", result.data);
+
       if (result.data) {
-        const apidata = result.data.map((player) => {
-          return { player: player };
+        const apidata = result.data.map(([name, overallRank]) => {
+          return { name, overallRank };
         });
         setData(apidata);
       } else {
@@ -71,7 +72,7 @@ function PlayersPage() {
                 <Box>
                   {Data.map((data, index) => (
                     <ListItem key={index}>
-                      <ListItemText primary={data.player[0]} />
+                      <ListItemText primary={`${data.name} - Overall Rank: ${data.overallRank}`} />
                     </ListItem>
                   ))}
                 </Box>
