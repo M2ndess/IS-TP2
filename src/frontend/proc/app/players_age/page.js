@@ -28,9 +28,11 @@ function PlayersPage() {
   const handleAgeInputChange = async () => {
     try {
       const result = await GET(`/players_age?min_age=${minAgeInput}&max_age=${maxAgeInput}`);
+      console.log("Server response:", result.data);
+
       if (result.data) {
-        const apidata = result.data.map((player) => {
-          return { player: player };
+        const apidata = result.data.map(([name, age]) => {
+          return { name, age };
         });
         setData(apidata);
       } else {
@@ -78,7 +80,7 @@ function PlayersPage() {
                 <Box>
                   {Data.map((data, index) => (
                     <ListItem key={index}>
-                      <ListItemText primary={data.player[0]} />
+                      <ListItemText primary={`${data.name} - Idade: ${data.age}`} />
                     </ListItem>
                   ))}
                 </Box>
