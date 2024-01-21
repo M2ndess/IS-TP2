@@ -1,4 +1,6 @@
 import sys
+import binascii
+import struct
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from utils.database import Database
@@ -12,6 +14,7 @@ db = Database()
 
 CORS(app)
 
+
 @app.route('/update_country_coords', methods=['PATCH'])
 def update_country_coords():
     try:
@@ -23,7 +26,7 @@ def update_country_coords():
         if not country_name or not latitude or not longitude:
             return jsonify({"error": "Faltam dados obrigatórios"}), 400
 
-        update_query = f"UPDATE countries SET coords = jsonb_build_object('type', 'Point', 'coordinates', ARRAY[{longitude}, {latitude}]::numeric[]) WHERE country_name = '{country_name}'"
+        update_query = f"UPDATE countries SET coords = ST_SetSRID(ST_MakePoint({longitude}, {latitude}), 4326) WHERE name = '{country_name}'"
         db.update(update_query)
 
         return jsonify({"message": "Coordenadas atualizadas com sucesso"}), 200
@@ -54,6 +57,25 @@ def get_countries():
 
     except Exception as e:
         # Handle other exceptions
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get_text_coordinates', methods=['GET'])
+def get_text_coordinates():
+    try:
+        # Use request.args to get the 'country_id' query parameter
+        country_id = request.args.get('country_id')
+
+        # Check if 'country_id' is provided
+        if not country_id:
+            return jsonify({"error": "Missing 'country_id' parameter"}), 400
+
+        # Use parameterized query to avoid SQL injection
+        query = "SELECT ST_AsText(coords) FROM countries WHERE id = %s"
+        result = db.selectAll(query, (country_id,))
+        text_coordinates = result[0] if result else 'N/A'
+
+        return jsonify({"textCoordinates": text_coordinates}), 200
+    except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

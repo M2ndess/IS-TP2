@@ -55,37 +55,29 @@ def fetch_coordinates(country_name):
 
 
 def store_coordinates(country_name, latitude, longitude):
-    db_params = {
-        "dbname": "is",
-        "user": "is",
-        "password": "is",
-        "host": "db-rel",
-        "port": 5432,
-    }
-
-    connection = psycopg2.connect(**db_params)
-    cursor = connection.cursor()
-
     try:
-        # Check if the province already exists
-        cursor.execute(f"SELECT * FROM countries WHERE name = %s", (country_name,))
-        result = cursor.fetchone()
+        api_gis_url = 'http://api-gis:8080/update_country_coords'
 
-        if result:
-            # Update existing province
-            cursor.execute(
-                f"UPDATE countries SET coords = ST_GeomFromText('POINT({longitude} {latitude})', 4326) "
-                f"WHERE name = %s",
-                (country_name,)
-            )
+        data = {
+            'country_name': country_name,
+            'latitude': longitude,
+            'longitude': latitude,
+        }
+
+        response = requests.patch(api_gis_url, json=data)
+
+        if response.status_code == 200:
+            print(f"Coordenadas atualizadas com sucesso para o país: {country_name}")
         else:
-            print(f"Province {country_name} not found.")
+            print(
+                f"Falha ao atualizar coordenadas para o país: {country_name}. Resposta da API GIS: {response.text}")
 
-        connection.commit()
+    except requests.RequestException as e:
+        print(f"Erro ao enviar dados para a API GIS: {e}")
 
-    finally:
-        cursor.close()
-        connection.close()
+finally:
+    cursor.close()
+    connection.close()
 
 
 if __name__ == "__main__":
