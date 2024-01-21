@@ -71,19 +71,33 @@ def get_text_coordinates():
 
         # Use parameterized query to avoid SQL injection
         query = "SELECT ST_AsText(coords) FROM countries WHERE id = %s"
-        result = db.selectAll(query, (country_id,))
 
-        # Extract coordinates from the result
-        text_coordinates = result[0][0] if result else 'N/A'
-        if text_coordinates != 'N/A':
-            # Extracting latitude and longitude from the "POINT(lon lat)" format
-            lon_lat_str = text_coordinates.replace('POINT(', '').replace(')', '')
-            lon, lat = map(float, lon_lat_str.split())
-            return jsonify({"longitude": lon, "latitude": lat}), 200
-        else:
-            return jsonify({"error": "Coordinates not found for the given country_id"}), 404
+        try:
+            # Execute selectOne with the query and parameters
+            result = db.selectCountry(query, (country_id,))
+
+            # Check if result is not None
+            if result:
+                # Extract coordinates from the result
+                text_coordinates = result[0] if result else 'N/A'
+                if text_coordinates != 'N/A':
+                    # Extracting latitude and longitude from the "POINT(lon lat)" format
+                    lon_lat_str = text_coordinates.replace('POINT(', '').replace(')', '')
+                    lon, lat = map(float, lon_lat_str.split())
+                    return jsonify({"longitude": lon, "latitude": lat}), 200
+                else:
+                    return jsonify({"error": "Coordinates not found for the given country_id"}), 404
+            else:
+                return jsonify({"error": f"No result found for country_id {country_id}"}), 404
+        except Exception as e:
+            # Handle exceptions related to database operations
+            return jsonify({"error": f"Database error: {str(e)}"}), 500
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Handle other exceptions
+        return jsonify({"error": f"Internal server error: {str(e)}"}), 500
+
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=PORT)
+    app.run(host="0.0.0.0", port=PORT, debug=True)
+

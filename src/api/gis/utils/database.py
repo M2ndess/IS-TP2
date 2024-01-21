@@ -59,6 +59,16 @@ class Database:
             result = cursor.fetchone()
         return result
 
+    def selectCountry(self, query, data):
+        self.connect()
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute(query, data)
+                result = cursor.fetchone()
+            return result
+        except psycopg2.Error as error:
+            print(f"Error: {error}")
+
     def soft_delete(self, file_name):
         self.connect()
         try:

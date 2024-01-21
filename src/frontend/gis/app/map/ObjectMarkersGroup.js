@@ -8,6 +8,19 @@ function CountryMarkersGroup() {
   const [countries, setCountries] = useState([]);
   const axios = crudAPI();
 
+  const fetchCoordinates = async (id) => {
+    try {
+      const response = await axios.GET(`/get_text_coordinates?country_id=${id}`);
+      const { latitude, longitude } = response.data;
+      // Process latitude and longitude as needed
+      console.log('Latitude:', latitude, 'Longitude:', longitude);
+      return { latitude, longitude };
+    } catch (error) {
+      console.error('Erro ao buscar coordenadas:', error);
+      return { latitude: 0, longitude: 0 }; // Retornar valores padrão ou tratar o erro conforme necessário
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -19,24 +32,18 @@ function CountryMarkersGroup() {
     };
 
     fetchData();
-  }, []);
+  }, [axios]);
 
   return (
     <LayerGroup>
       {countries.map((country) => (
         <ObjectMarker
           key={country.id}
-          geoJSON={{
-            type: 'feature',
-            geometry: {
-              type: 'Point',
-              coordinates: country.coordinates.coordinates,
-            },
-            properties: {
-              id: country.id,
-              name: country.name,
-              imgUrl: `https://cdn-icons-png.flaticon.com/512/805/805401.png`,
-            },
+          coordinates={fetchCoordinates(country.id)}
+          properties={{
+            id: country.id,
+            name: country.name,
+            imgUrl: `https://cdn-icons-png.flaticon.com/512/805/805401.png`,
           }}
         />
       ))}
