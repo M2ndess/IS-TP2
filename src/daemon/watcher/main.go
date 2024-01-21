@@ -73,17 +73,14 @@ type CompetitionPlayer struct {
 	CompetitionID  string `xml:"competition_id,attr" db:"competition_id"`
 }
 
-// Estrutura geral para enviar ao RabbitMQ
 type RabbitMQMessage struct {
 	EntityName string      `json:"entity_name"`
 	Data       interface{} `json:"data"`
 }
 
 func sendMessageToBroker(entityName string, data interface{}, ch *amqp.Channel) bool {
-	// Create the connection string
 	connectionString := fmt.Sprintf("amqp://is:is@rabbitMQ:5672/is")
 
-	// Create a new AMQP connection
 	conn, err := amqp.Dial(connectionString)
 	if err != nil {
 		CheckError(err)
@@ -104,13 +101,11 @@ func sendMessageToBroker(entityName string, data interface{}, ch *amqp.Channel) 
 		return false
 	}
 
-	// Crie a mensagem a ser enviada ao RabbitMQ
 	rabbitMQMessage := RabbitMQMessage{
 		EntityName: entityName,
 		Data:       data,
 	}
 
-	// Converta a mensagem para JSON
 	messageBody, err := json.Marshal(rabbitMQMessage)
 	if err != nil {
 		CheckError(err)
@@ -135,6 +130,50 @@ func sendMessageToBroker(entityName string, data interface{}, ch *amqp.Channel) 
 	// Print success message
 	fmt.Printf("Successfully sent message to RabbitMQ for entity: %s\n", entityName)
 	return true
+}
+
+func sendCountryNameToBroker(countryName string, ch *amqp.Channel) bool {
+    connectionString := fmt.Sprintf("amqp://is:is@rabbitMQ:5672/is")
+
+    conn, err := amqp.Dial(connectionString)
+    if err != nil {
+        CheckError(err)
+        return false
+    }
+    defer conn.Close()
+
+    q, err := ch.QueueDeclare(
+        "coords_queue",
+        false,                   // Durable
+        false,                   // Delete when unused
+        false,                   // Exclusive
+        false,                   // No-wait
+        nil,                     // Arguments
+    )
+    if err != nil {
+        CheckError(err)
+        return false
+    }
+
+    err = ch.Publish(
+        "",           // Exchange
+        q.Name,       // Routing key
+        false,        // Mandatory
+        false,        // Immediate
+        amqp.Publishing{
+            ContentType: "text/plain",
+            Body:        []byte(fmt.Sprintf("Get coordinates for Country: %s", countryName)),
+        },
+    )
+    if err != nil {
+        CheckError(err)
+        return false
+    }
+
+    fmt.Println("Successfully sent province update message to RabbitMQ")
+
+    fmt.Printf("Get coordinates for Country: %s\n", countryName)
+    return true
 }
 
 func checkUnmigratedFiles(db *sql.DB, ch *amqp.Channel) {
@@ -168,8 +207,9 @@ func checkUnmigratedFiles(db *sql.DB, ch *amqp.Channel) {
 func processCountries(countries []Country, ch *amqp.Channel) {
 	for _, country := range countries {
 		fmt.Printf("Country: %s\n", country.Name)
-		// Enviar mensagem para o RabbitMQ para a country
+
 		sendMessageToBroker("Country", country, ch)
+		sendCountryNameToBroker(country.Name, ch)
 	}
 }
 

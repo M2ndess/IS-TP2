@@ -63,8 +63,6 @@ model CompetitionPlayer {
 model Country {
   id          String    @id
   name        String
-  latitude    String
-  longitude   String
 
   @@map("countries")
 }

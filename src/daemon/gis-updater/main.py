@@ -1,70 +1,106 @@
 import sys
 import time
-
-from pip._vendor import requests
+import pika
+import json
+import urllib.parse
+import urllib.request
+import psycopg2
 
 POLLING_FREQ = int(sys.argv[1]) if len(sys.argv) >= 2 else 60
 ENTITIES_PER_ITERATION = int(sys.argv[2]) if len(sys.argv) >= 3 else 10
-URL_API_ENTITIES = 'http://api-entities:8080'
 
-def generate_coords(region: str):
-    url = "https://nominatim.openstreetmap.org/"
+RabbitMQURL = "amqp://is:is@rabbitMQ:5672/is"
+CoordsQueue = "coords_queue"
+DB_URL = "postgresql://is:is@db-rel:543/is"
 
+
+def callback(ch, method, properties, body):
+    try:
+        message_str = body.decode()
+
+        if "Get coordinates for Country:" in message_str:
+            country_name = message_str.split("Get coordinates for Country:")[1].strip()
+
+            latitude, longitude = fetch_coordinates(country_name)
+            print(f"Received message for country: {country_name}, Coordinates: {latitude}, {longitude}")
+
+            store_coordinates(country_name, latitude, longitude)
+
+        else:
+            country_name = "Unknown Country"
+
+        print(f"Received message for country: {country_name}")
+
+    except Exception as e:
+        print(f"Error processing message: {e}")
+
+
+def fetch_coordinates(country_name):
+    endpoint = "https://nominatim.openstreetmap.org/search"
     params = {
-        'q': region,
-        'limit': '1',
-        'format': 'json'
+        "q": country_name,
+        "format": "json",
+        "limit": 1,
+    }
+    url = f"{endpoint}?{urllib.parse.urlencode(params)}"
+
+    with urllib.request.urlopen(url) as response:
+        data = json.load(response)
+        if data:
+            location = data[0]
+            latitude = float(location.get("lat"))
+            longitude = float(location.get("lon"))
+            return latitude, longitude
+    return None
+
+
+def store_coordinates(country_name, latitude, longitude):
+    db_params = {
+        "dbname": "is",
+        "user": "is",
+        "password": "is",
+        "host": "db-rel",
+        "port": 5432,
     }
 
-    r = requests.get(url=url, params=params)
+    connection = psycopg2.connect(**db_params)
+    cursor = connection.cursor()
 
-    data = r.json()
+    try:
+        # Check if the province already exists
+        cursor.execute(f"SELECT * FROM countries WHERE name = %s", (country_name,))
+        result = cursor.fetchone()
 
-    return [
-        data[0]["lat"],
-        data[0]["lon"]
-    ]
+        if result:
+            # Update existing province
+            cursor.execute(
+                f"UPDATE countries SET coords = ST_GeomFromText('POINT({longitude} {latitude})', 4326) "
+                f"WHERE name = %s",
+                (country_name,)
+            )
+        else:
+            print(f"Province {country_name} not found.")
 
-def getCoordsWithoutUpdate():
-    url = f"{URL_API_ENTITIES}/api/countries/to_update/{ENTITIES_PER_ITERATION}"
+        connection.commit()
 
-    r = requests.get(url=url)
+    finally:
+        cursor.close()
+        connection.close()
 
-    data = r.json()
 
-    return data
-#test
 if __name__ == "__main__":
+
+    # Establish a connection to RabbitMQ
+    connection = pika.BlockingConnection(pika.URLParameters(RabbitMQURL))
+    channel = connection.channel()
+
+    # Declare the queue
+    channel.queue_declare(queue=CoordsQueue)
+    channel.basic_consume(queue=CoordsQueue, on_message_callback=callback, auto_ack=True)
+
+    print(f"Waiting for messages from {CoordsQueue}...")
+
     while True:
-        print(f"Getting up to {ENTITIES_PER_ITERATION} entities without coordinates...")
-        # !TODO: 1- Use api-entities to retrieve a fixed amount of entities without coordinates (e.g. 100 entities per iteration, use ENTITIES_PER_ITERATION)
-        # !TODO: 2- Use the entity information to retrieve coordinates from an external API
-        # !TODO: 3- Submit the changes
-
-        for data in getCoordsWithoutUpdate():
-            #Because Sometimes the api of nominatim crashes. When their api crashes, we can retry the request
-            while True:
-                found = False
-                try:
-                    coords = generate_coords(data['name'])
-                    found = True
-                except requests.exceptions.ConnectionError:
-                    found = False
-                if found:
-                    break
-                else:
-                    time.sleep(POLLING_FREQ)
-                    continue
-
-            url = f"{URL_API_ENTITIES}/api/countries/update"
-            myobj = {
-                'id': data['id'][0],
-                'name':data['name'],
-                'lat' : coords[0],
-                'lon' : coords[1]
-            }
-
-            x = requests.post(url, json=myobj)
-
+        channel.start_consuming()
 
         time.sleep(POLLING_FREQ)

@@ -30,8 +30,7 @@ export class CountryService {
       data: {
         id: data.ID,
         name: data.Name,
-        latitude: '',
-        longitude: '',
+        coords: null,
       },
     });
   }
