@@ -20,8 +20,9 @@ def get_players_by_team():
 def get_players_by_age():
     server_url = 'http://rpc-server:9000'
     server = xmlrpc.client.ServerProxy(server_url)
-    age=request.args.get("age")
-    players = server.get_player_by_age(age)
+    max_age = request.args.get("max_age")
+    min_age=request.args.get("min_age")
+    players = server.get_players_by_age(min_age, max_age)
 
     return players
 

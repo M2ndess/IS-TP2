@@ -22,12 +22,12 @@ import TextField from '@mui/material/TextField';
 function PlayersPage() {
   const { GET } = useAPI();
 
-  const [manualCountryInput, setManualCountryInput] = useState("");
+  const [manualTeamInput, setManualTeamInput] = useState("");
   const [Data, setData] = useState(null);
 
-  const handleCountryInputChange = async () => {
+  const handleTeamInputChange = async () => {
     try {
-      const result = await GET(`/players_country?country=${manualCountryInput}`);
+      const result = await GET(`/players_team?nome_team=${manualTeamInput}`);
       if (result.data) {
         const apidata = result.data.map((player) => {
           return { player: player };
@@ -46,20 +46,20 @@ function PlayersPage() {
     <Container maxWidth="md">
       <Box my={4}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Players by Country
+          Players by Team
         </Typography>
         <TextField
-          label="Introduza o nome do país"
+          label="Introduza o nome da equipa"
           variant="outlined"
           fullWidth
-          value={manualCountryInput}
-          onChange={(e) => setManualCountryInput(e.target.value)}
+          value={manualTeamInput}
+          onChange={(e) => setManualTeamInput(e.target.value)}
         />
         <Box mt={2}>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleCountryInputChange}
+            onClick={handleTeamInputChange}
           >
             Pesquisar
           </Button>
@@ -76,7 +76,7 @@ function PlayersPage() {
                   ))}
                 </Box>
               ) : (
-                manualCountryInput ? <CircularProgress /> : "--"
+                manualTeamInput ? <CircularProgress /> : "--"
               )}
             </Box>
           </Paper>
