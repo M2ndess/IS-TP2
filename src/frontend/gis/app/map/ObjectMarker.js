@@ -14,8 +14,8 @@ const LIST_PROPERTIES = [
 ];
 
 export function ObjectMarker({geoJSON}) {
-    const properties = geoJSON?.properties
-    const {id, imgUrl, name} = properties;
+    const properties = geoJSON?.properties;
+    const {id, imgUrl, name, country, number, position} = properties;
     const coordinates = geoJSON?.geometry?.coordinates;
 
     return (
@@ -35,25 +35,29 @@ export function ObjectMarker({geoJSON}) {
                         </ListItemIcon>
                         <ListItemText primary={name}/>
                     </ListItem>
-                    {
-                        LIST_PROPERTIES
-                            .map(({key, label, Icon}) =>
-                                <ListItem key={key}>
-                                    <ListItemIcon>
-                                        <Icon style={{color: "black"}}/>
-                                    </ListItemIcon>
-                                    <ListItemText
-                                        primary={<span>
-                                        {properties[key]}<br/>
-                                        <label style={{fontSize: "xx-small"}}>({label})</label>
-                                    </span>}
-                                    />
-                                </ListItem>
-                            )
-                    }
-
+                    <ListItem>
+                        <ListItemIcon>
+                            <FlagIcon style={{color: "black"}}/>
+                        </ListItemIcon>
+                        <ListItemText
+                            primary={<span>
+                                {country} - {coordinates[0]}, {coordinates[1]}<br/>
+                                <label style={{fontSize: "xx-small"}}>(Country - Coordinates)</label>
+                            </span>}
+                        />
+                    </ListItem>
+                    <ListItem>
+                        <ListItemIcon>
+                            <ContactsIcon style={{color: "black"}}/>
+                        </ListItemIcon>
+                        <ListItemText
+                            primary={<span>
+                                Shirt Number: {number}<br/>
+                                <label style={{fontSize: "xx-small"}}>(Shirt Number)</label>
+                            </span>}
+                        />
+                    </ListItem>
                 </List>
-
             </Popup>
         </Marker>
     )
