@@ -79,7 +79,7 @@ class Database:
                     name,
                     coords
                 FROM
-                    Countries
+                    countries
                 WHERE
                     coords IS NOT NULL
             """
@@ -94,3 +94,18 @@ class Database:
 
         except psycopg2.Error as error:
             print(f"Error: {error}")
+
+    def update(self, update_query, data=None):
+        self.connect()
+        try:
+            if data:
+                self.cursor.execute(update_query, data)
+            else:
+                self.cursor.execute(update_query)
+            self.connection.commit()
+            print("\nA query de atualização foi bem executada.")
+            print(f"Executing update query: {update_query}")
+
+        except psycopg2.Error as error:
+            print(f"\nError: {error}")
+            self.connection.rollback()

@@ -29,7 +29,7 @@ export class CompetitionService {
   }
 
   async create(data: any): Promise<any> {
-    return this.prisma.players.create({
+    return this.prisma.competition.create({
       data: {
         id: data.ID,
         year: data.Year,

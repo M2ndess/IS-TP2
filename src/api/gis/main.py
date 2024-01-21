@@ -16,21 +16,20 @@ CORS(app)
 def update_country_coords():
     try:
         data = request.json
-        country_name = data.get('name')
-        coords = data.get('coords')
+        country_name = data.get('country_name')
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
 
-        if not country_name or not coords:
+        if not country_name or not latitude or not longitude:
             return jsonify({"error": "Faltam dados obrigatórios"}), 400
 
-        update_query = f"UPDATE country SET geom = jsonb_build_object('type', 'Point', 'coordinates', ARRAY{coords}::numeric[]) WHERE country_name = '{country_name}'"
+        update_query = f"UPDATE countries SET coords = jsonb_build_object('type', 'Point', 'coordinates', ARRAY[{longitude}, {latitude}]::numeric[]) WHERE country_name = '{country_name}'"
         db.update(update_query)
 
         return jsonify({"message": "Coordenadas atualizadas com sucesso"}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-from flask import jsonify
 
 @app.route('/get_countries', methods=['GET'])
 def get_countries():

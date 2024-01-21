@@ -30,7 +30,6 @@ export class CountryService {
       data: {
         id: data.ID,
         name: data.Name,
-        coords: null,
       },
     });
   }

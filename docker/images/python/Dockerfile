@@ -16,6 +16,9 @@ RUN npm install nodemon -g
 # install build dependencies
 RUN apk add g++
 
+# install geos
+RUN apk add --no-cache geos geos-dev
+
 # upgrade pip
 RUN python -m pip install --upgrade pip
 
@@ -26,6 +29,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # install requests
 RUN pip install requests
 RUN pip install pika
+RUN pip install shapely
 
 # install Flask-CORS
 RUN pip install flask-cors

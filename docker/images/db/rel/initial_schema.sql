@@ -34,7 +34,7 @@ CREATE TABLE public.players (
 CREATE TABLE public.countries (
     id       VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4(),
     name     VARCHAR(250) UNIQUE NOT NULL,
-    coords      geometry(Point, 4326)
+    coords   GEOMETRY(Point, 4326)
 );
 
 -- Competition Table
