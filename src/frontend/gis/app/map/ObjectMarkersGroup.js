@@ -8,44 +8,50 @@ function CountryMarkersGroup() {
   const [countries, setCountries] = useState([]);
   const axios = crudAPI();
 
-  const fetchCoordinates = async (id) => {
-    try {
-      const response = await axios.GET(`/get_text_coordinates?country_id=${id}`);
-      const { latitude, longitude } = response.data;
-      // Process latitude and longitude as needed
-      console.log('Latitude:', latitude, 'Longitude:', longitude);
-      return { latitude, longitude };
-    } catch (error) {
-      console.error('Erro ao buscar coordenadas:', error);
-      return { latitude: 0, longitude: 0 }; // Retornar valores padrão ou tratar o erro conforme necessário
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.GET('/get_countries');
-        setCountries(response.data);
+        // Obter dados dos países
+        const countriesResponse = await axios.GET('/get_countries');
+        const countriesData = countriesResponse.data;
+
+        // Para cada país, obter coordenadas e atualizar o estado
+        const countriesWithCoordinates = await Promise.all(
+          countriesData.map(async (country) => {
+            const coordinatesResponse = await axios.GET(`/get_text_coordinates?country_id=${country.id}`);
+            const coordinatesData = coordinatesResponse.data;
+            return {
+              id: country.id,
+              name: country.name,
+              geoJSON: {
+                type: 'feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: [coordinatesData.longitude, coordinatesData.latitude],
+                },
+                properties: {
+                  id: country.id,
+                  name: country.name,
+                  imgUrl: `https://cdn-icons-png.flaticon.com/512/805/805401.png`,
+                },
+              },
+            };
+          })
+        );
+
+        setCountries(countriesWithCoordinates);
       } catch (error) {
         console.error('Erro ao buscar dados da API:', error);
       }
     };
 
     fetchData();
-  }, [axios]);
+  }, []);
 
   return (
     <LayerGroup>
       {countries.map((country) => (
-        <ObjectMarker
-          key={country.id}
-          coordinates={fetchCoordinates(country.id)}
-          properties={{
-            id: country.id,
-            name: country.name,
-            imgUrl: `https://cdn-icons-png.flaticon.com/512/805/805401.png`,
-          }}
-        />
+        <ObjectMarker key={country.id} geoJSON={country.geoJSON} />
       ))}
     </LayerGroup>
   );
