@@ -70,9 +70,12 @@ function PlayersPage() {
               {Data ? (
                 <Box>
                   {Data.map((data, index) => (
-                    <ListItem key={index}>
-                      <ListItemText primary={data.player[0]} />
-                    </ListItem>
+                    // Use split(',') to get an array of player names
+                    data.player[0].split(',').map((playerName, playerIndex) => (
+                      <ListItem key={`${index}-${playerIndex}`}>
+                        <ListItemText primary={playerName.replace(/[{}]/g, '').trim()} />
+                      </ListItem>
+                    ))
                   ))}
                 </Box>
               ) : (
