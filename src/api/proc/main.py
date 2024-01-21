@@ -11,7 +11,7 @@ CORS(app)
 def get_players_by_team():
     server_url = 'http://rpc-server:9000'
     server = xmlrpc.client.ServerProxy(server_url)
-    nome_team=request.args.get("nome_team")
+    nome_team = request.args.get("nome_team")
     players = server.get_players_by_team(nome_team)
 
     return players
@@ -38,7 +38,7 @@ def get_players_by_overall_rank():
 def get_players_by_country():
     server_url = 'http://rpc-server:9000'
     server = xmlrpc.client.ServerProxy(server_url)
-    country=request.args.get("country")
+    country = request.args.get("country")
     players = server.get_players_by_country(country)
 
     return players
