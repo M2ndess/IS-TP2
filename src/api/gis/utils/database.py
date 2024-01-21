@@ -69,3 +69,28 @@ class Database:
         except psycopg2.Error as error:
             print(f"\nError: {error}")
         self.disconnect()
+
+    def selectCountries(self, limit=None):
+        try:
+            self.connect()
+            query = """
+                SELECT
+                    id,
+                    name,
+                    coords
+                FROM
+                    Countries
+                WHERE
+                    coords IS NOT NULL
+            """
+            if limit is not None:
+                query += f" LIMIT {limit}"
+
+            with self.connection.cursor() as cursor:
+                cursor.execute(query)
+                results = cursor.fetchall()
+
+            return results
+
+        except psycopg2.Error as error:
+            print(f"Error: {error}")
